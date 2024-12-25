@@ -14,12 +14,16 @@ is_auth,
 groupValidation.createGroupValidation,
 groupController.createGroup);
 
-router.get('/view',
-// getGroupsForUser);
-// is_auth ,
-// authAspect.applyBeforeController(groupController.getGroupsForUser));
+router.get('/user',
+is_auth,
 groupController.getGroupsForUser);
 
-router.get('/getgroups', groupController.getGroups);
+// router.get('/view',
+// // getGroupsForUser);
+// // is_auth ,
+// // authAspect.applyBeforeController(groupController.getGroupsForUser));
+// groupController.getGroupsForUser);
+
+// router.get('/getgroups', groupController.getGroups);
 
 module.exports = router ;

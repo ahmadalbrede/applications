@@ -4,7 +4,7 @@ const authController = require('../controllers/authintication');
 const authValidation = require('../util/validations/authValidation');
 
 router.post('/register', 
-// authValidation.registerValidation,
+authValidation.registerValidation,
 authController.register);
 
 router.post('/login',

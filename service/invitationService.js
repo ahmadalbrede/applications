@@ -1,51 +1,50 @@
-const Invitation = require('../models/Invitation');
-const Group = require('../models/Group');
-const GroupUser = require('../models/GroupUser');
-const Sequelize = require('sequelize');
-const sequelize = require('../util/database');
 
-
+const invitationRepository = require('../repositories/invitationRepository');
+const groupUserRepository = require('../repositories/GroupUserRepository');
+exports.sendInvitation = async(dataInvitation)=>{
+    try{
+        return await invitationRepository.createInvitation(dataInvitation);
+    }
+    catch(err){
+        throw err ;
+    }
+}
 
 exports.getInvitationForUser = async(userId)=>{
     try{
-        return await Invitation.findAll({
-            where : {userId : userId},
-            include :{
-                model : Group ,
-                required : true
-            }
-        })
-        // return await Group.findAll({
-        //     include :{
-        //         model : Invitation,
-        //         required : true ,
-        //         where : {userId , userId}
-        //     }
-        // })
-        // return await sequelize.query('SELECT * FROM `invitations` INNER JOIN `groups` ON `invitations`.`groupId` = `groups`.`id` AND `invitations`.`userId` = ?',{
-        //         replacements: [userId],});
+        return await invitationRepository.getInvitationsForUser(userId);
     }
     catch(err){
-        throw err;
+        throw err ;
     }
 }
 
-exports.getInvitation = async(invitationId)=>{
+exports.acceptInvitation = async(invitationData)=>{
     try{
-        return await Invitation.findOne({ where : { id : invitationId }});
+        const invitation = await invitationRepository.getInvitationById(invitationData.id);
+        if(invitation === null){
+            const error = new Error('invitation not found')
+            error.statusCode = 404
+            throw error ;
+        }
+        if(invitation.userId != invitationData.userId ){
+            const error = new Error('permission denied');
+            error.statusCode = 403 ; 
+            throw error ;
+        }
+        // invitation.acceptance = true ;
+        // await invitation.save();
+        await groupUserRepository.createGroupUser({
+            userId : invitationData.userId,
+            groupId : invitation.groupId
+        });
+        await invitationRepository.deleteInvitation(invitationData.id);
+        return {
+            message : "accept invitation successfuly"
+        };
     }
     catch(err){
         throw err;
     }
 }
-
-exports.acceptInvitation = async(invitation)=>{
-    try{
-
-        invitation.acceptance = true ; 
-        return invitation.save();
-    }
-    catch(err){
-        throw err;
-    }
-}
+/////////////////////////////////////////

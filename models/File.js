@@ -19,6 +19,14 @@ const File = sequelize.define('file',{
     state : {
         type : Sequelize.BOOLEAN ,
         defaultValue : true 
+    },
+    accept : {
+        type : Sequelize.BOOLEAN ,
+        defaultValue : false
+    },
+    userId : {
+        type : Sequelize.INTEGER ,
+        defaultValue : null 
     }
 });
 

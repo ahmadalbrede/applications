@@ -1,6 +1,6 @@
-const {body} = require('express-validator');
+const {body , query} = require('express-validator');
 const validatorResult = require('../validatorResult');
-const userService = require('../../service/userService');
+const userRepository = require('../../repositories/userRepository');
 
 exports.registerValidation = [
     body('name').trim()
@@ -10,27 +10,14 @@ exports.registerValidation = [
     body('email').trim()
     .notEmpty().withMessage('email is required')
     .isEmail().withMessage('the email format is not correct')
-    .custom((value)=>{
-        userService.getUser(value)
-        .then(user =>{
+    .custom(async (value)=>{
+        const user = await userRepository.getUserByEmail(value);
             if(user){
                 throw new Error('this email is already in use')
             }
-            else{
-                return true ;
-            }
-        })
-    } ),
-    // .custom(async (value, { req }) => {
-    //     const user = await userService.getUser(value);
-    //     if (user) {
-
-    //         // return Promise.reject('This email is already in use.');
-    //         throw new Error('This email is already in use.')
-    //     }
-    
-    // }),
-
+    } )
+    .withMessage('this email is already exist')
+    ,
     body('password').trim()
     .notEmpty().withMessage('password is required')
     .isString().withMessage('password must be string')
@@ -51,4 +38,12 @@ exports.loginValidation = [
     .isLength({min : 8 }).withMessage('password is too short'),
     validatorResult
 ];
+
+exports.groupIdValidation = [
+    query('groupId').trim()
+    .notEmpty().withMessage('groupID is required')
+    .isInt({ gt: 0 }).withMessage('ID must be a positive integer'),
+
+    validatorResult
+]
 

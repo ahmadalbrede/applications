@@ -1,0 +1,29 @@
+npm init
+npm install nodemon --save-dav
+npm install --save express 
+npm install --save body-parser
+npm install --save mysql2
+npm install --save bcryptjs 
+npm install --save csurf 
+npm install --save connect-mongodb-session
+npm install --save nodemailer nodemailer-sendgrid-transport 
+npm install --save express-validator 
+npm install --save multer ///to parser file data 
+package : PDFKit : to create pdf file 
+npm install --save pdfkit
+JWT 
+npm install --save jsonwebtoken
+npm install --save dotenv
+rest API : Representational State Transfer
+npm install --save socket.io
+npm install --save express-async-handler
+
+// compression
+
+app.use(compression());
+
+app.use(morgan('dev'));
+
+app.use(helmet.hsts());
+
+// Chalk for color 

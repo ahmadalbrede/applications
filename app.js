@@ -9,6 +9,7 @@ const authRouter = require('./routers/auth');
 const groupRoute = require('./routers/groupRoute');
 const invitationRoute = require('./routers/invitationRoute');
 const userRoute = require('./routers/userRouter');
+const fileRoute = require('./routers/fileRoute');
 
 const User = require('./models/User');
 const Group = require('./models/Group');
@@ -37,7 +38,8 @@ app.use(multer({storage : fileStore , limits: { fileSize: 10 * 1024 * 1024 }, fi
 app.use(authRouter);
 app.use('/group',groupRoute);
 app.use('/invitation',invitationRoute);
-app.use(userRoute);
+app.use('/user',userRoute);
+app.use('/file',fileRoute);
 
 
 app.use(( error , req , res , next )=>{
