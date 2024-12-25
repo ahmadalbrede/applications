@@ -2,6 +2,7 @@ const fileRepostory = require('../repositories/fileRepository');
 const fs = require('fs');
 const groupUserRepository = require('../repositories/GroupUserRepository')
 const groupRepository = require('../repositories/groupRepository');
+const sequelize = require('../util/database');
 
 exports.addFile = async(data , userId)=>{
     try{
@@ -21,7 +22,6 @@ exports.addFile = async(data , userId)=>{
 exports.updateFile = async(data , userId)=>{
     try{
         const file = await fileRepostory.getFileById(data.fileId);
-        console.log(';jfdakl;alksdj;dfjaskl',file.state , file.userId)
         if(file.state === true || file.userId !== userId ){
             const error = new Error('you must make check in for file first');
             error.statusCode = 400 ; 
@@ -91,22 +91,30 @@ exports.deleteFile = async(fileId , userId)=>{
 
 exports.checkInFile = async(fileId , userId)=>{
     try{
-        const file = await fileRepostory.getFileById(fileId);
-        if(!file){
-            const error = new Error('file not found');
-            error.statusCode = 404 ;
-            throw error ;
-        }
-        if(!file.state){
-            return false ; 
-        }
-        const groupUser = await groupUserRepository.getgroupUser(file.groupId , userId);
-        if(groupUser.length === 0){
-            const error = new Error('not in the group');
-            error.statusCode = 403 ;
-            throw error ;
-        }
-        return await fileRepostory.checkInFile(fileId , userId);
+        return await sequelize.transaction(async (transaction)=> {
+            const file = await fileRepostory.getFileByIdWithlock(fileId , transaction);
+            if(!file){
+                const error = new Error('file not found');
+                error.statusCode = 404 ;
+                throw error ;
+            }
+            if(!file.state){
+                const error = new Error('file is reserve');
+                error.statusCode = 409;
+                throw error ;
+            }
+            const groupUser = await groupUserRepository.getgroupUserWithTransaction(file.groupId , userId , transaction);
+            if(groupUser.length === 0){
+                const error = new Error('not in the group');
+                error.statusCode = 403 ;
+                throw error ;
+            }
+            file.state = false ;
+            file.userId = userId ;
+            return await file.save({transaction});
+        })
+        
+        
     }
     catch(err){
         throw err ; 
@@ -115,16 +123,26 @@ exports.checkInFile = async(fileId , userId)=>{
 
 exports.checkInMultipleFile = async(files , userId)=>{
     try{
-        const countFile = await fileRepostory.getFilesWithStateTrue(files);
-        if(countFile.length !== files.length){
-            const error = new Error('One or more files are not available for reservation')
-            error.statusCode = 400 ;
-            throw error ;
-        }
-        await fileRepostory.checkInFile(files , userId)
-        return {
-            message: 'Files reserved successfully'
-        }
+        return await sequelize.transaction(async (transaction)=>{
+            const countFile = await fileRepostory.getFilesWithStateTrue(files ,transaction);
+            if(countFile.length !== files.length){
+                const error = new Error('One or more files are not available for reservation')
+                error.statusCode = 400 ;
+                throw error ;
+            }
+            for (const file of countFile) {
+                file.state = false;
+                file.userId = userId;
+                await file.save({ transaction });
+            }
+            return {
+                message: 'Files reserved successfully'
+            }
+        
+    })
+        
+        // await fileRepostory.checkInFile(files , userId)
+        
     }
     catch(err){
         throw err ;

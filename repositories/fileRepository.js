@@ -42,9 +42,11 @@ exports.checkInFile = async(fileId , userId)=>{
         },)
 }
 
-exports.getFilesWithStateTrue = async(files)=>{
+exports.getFilesWithStateTrue = async(files , transaction)=>{
     return await File.findAll({
-        where : { id : files , state : true }
+        where : { id : files , state : true } ,
+        lock : transaction.LOCK.UPDATE,
+        transaction
     })
 }
 
@@ -61,4 +63,12 @@ exports.acceptFile = async(fileId)=>{
             where : {id : fileId}
         }
     )
+}
+
+exports.getFileByIdWithlock = async(fileId , transaction)=>{
+    return await File.findOne({
+        where : {id : fileId},
+        lock: transaction.LOCK.UPDATE,
+        transaction ,
+    })
 }

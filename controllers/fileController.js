@@ -100,7 +100,9 @@ exports.checkInFile = (req , res ,next)=>{
 exports.checkInMultipleFile = (req , res , next)=>{
     const files = req.body.files ;
     if (!Array.isArray(files) || files.length === 0) {
-        return res.status(400).send({ message: 'Invalid file IDs provided' });
+        const error = new Error('fileIds is required and must be an array');
+        error.statusCode = 400;
+        return next(error);
     }
     fileService.checkInMultipleFile(files , req.user.id)
     .then(result => {
