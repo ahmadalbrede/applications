@@ -53,7 +53,9 @@ fileController.updateFile)
 
 router.put('/check-in-multiple',
 is_auth,
-withTransactionAspect(fileController.checkInMultipleFile,transactionSettings));
+fileController.checkInMultipleFile,
+// withTransactionAspect(fileController.checkInMultipleFile,transactionSettings)
+);
 
 router.get('/not-accept',
 is_auth,

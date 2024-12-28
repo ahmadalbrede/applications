@@ -73,6 +73,11 @@ exports.deleteFile = async(fileId , userId)=>{
             error.statusCode = 403 ;
             throw error;
         }
+        if(!file.state){
+            const error = new Error('can not delete file now , the file is reseve');
+            error.statusCode = 409 ; 
+            throw error ;
+        }
         fs.access(file.path ,fs.constants.F_OK , (err)=> {
             if(err){
                 throw err ;
@@ -113,17 +118,13 @@ exports.checkInFile = async(fileId , userId)=>{
             file.userId = userId ;
             return await file.save({transaction});
         })
-        
-        
     }
     catch(err){
         throw err ; 
     }
 }
-
-exports.checkInMultipleFile = async(files , userId)=>{
+exports.checkInMultipleFile = async(transaction , files , userId)=>{
     try{
-        return await sequelize.transaction(async (transaction)=>{
             const countFile = await fileRepostory.getFilesWithStateTrue(files ,transaction);
             if(countFile.length !== files.length){
                 const error = new Error('One or more files are not available for reservation')
@@ -137,12 +138,7 @@ exports.checkInMultipleFile = async(files , userId)=>{
             }
             return {
                 message: 'Files reserved successfully'
-            }
-        
-    })
-        
-        // await fileRepostory.checkInFile(files , userId)
-        
+            }        
     }
     catch(err){
         throw err ;

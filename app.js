@@ -43,7 +43,6 @@ app.use('/file',fileRoute);
 
 
 app.use(( error , req , res , next )=>{
-    console.log('hte big middleware errror ror orror ')
     const status = error.statusCode || 500 ; 
     const message = error.message ; 
     console.log(error);
@@ -87,7 +86,7 @@ Report.belongsTo(User , {foreignKey : 'userId'});
 // {force : true }
 sequelize.sync()
 .then(result => {
-    console.log("the the the ",Invitation.associations);
+    // console.log("the the the ",Invitation.associations);
     // console.log(result);
     app.listen(3000);
 })

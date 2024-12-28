@@ -1,6 +1,7 @@
 const fileService = require('../service/fileService');
 const path = require('path');
 const groupService = require('../service/groupService');
+const withTransactionAspect = require('../middleware/withTransactionAspect')
 
 exports.addFile = (req, res, next) => {
     const data = req.body;
@@ -97,18 +98,18 @@ exports.checkInFile = (req , res ,next)=>{
     .catch(err => next(err));
 }
 
-exports.checkInMultipleFile = (req , res , next)=>{
-    const files = req.body.files ;
+exports.checkInMultipleFile = (req, res, next) => {
+    const files = req.body.files;
     if (!Array.isArray(files) || files.length === 0) {
         const error = new Error('fileIds is required and must be an array');
         error.statusCode = 400;
         return next(error);
     }
-    fileService.checkInMultipleFile(files , req.user.id)
-    .then(result => {
-        return res.status(200).json(result)
-    }).catch(err => next(err));
-}
+    withTransactionAspect(fileService.checkInMultipleFile, files, req.user.id)
+    .then((result) => {
+        return res.status(200).json(result);
+    }).catch((err) => next(err));
+};
 
 exports.getFilesNotAccept = (req , res , next)=>{
     fileService.getFileNotAccept(req.query.groupId)

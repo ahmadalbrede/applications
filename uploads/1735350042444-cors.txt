@@ -1,0 +1,20 @@
+Cross-Origin Resource Sharing (CORS) is a security mechanism implemented in web browsers
+that allows a web page from one domain to request resources from another domain, which would otherwise be prohibited by the Same-Origin Policy (SOP).
+//////////////////////////////////////////////////////////////
+Cross-Origin Resource Sharing (CORS) is a security mechanism implemented in web browsers
+
+لحماية اليوزر من الهجمات الضارة اللتي ممكن ان تحدث عندما تتواصل مواقع الويب المختلفة مع بعضها البعض 
+
+resoures المسموح لها بالوصول الى ال domains بتحديد ال web server هي الية تسمح ل cors ال
+
+قد server لمعرفة اذا كان ال browser اخر يتحقق ال domain مستضاف على web server الى request ما تقديم domain مستضافة على web bage عندما تحاول 
+
+cors سمح بالطلب باستتخدام ال 
+
+the browser will block the request to prevent unauthorized access لم يسمح بالطلب server اذا كان ال 
+
+(cross-site scripting attacks)مهم لانه يساعد في منع الهجمات النصية عبر المواقع cors 
+
+التي يمكن ان تستخدم لسرقة المعلومات حساسة من اليوزر 
+
+مما يقلل مثل هذه الهجمات their resource يمكن لمطوري الويب التأكد من ان المجالات فقط هي التي يمكنها الوصول الى cors من خلال فرض ال
