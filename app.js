@@ -1,5 +1,11 @@
 const express = require('express'); 
+const http = require('http');
+// const {Server} = require('socket.io')
 const app = express(); 
+const server = http.createServer(app);
+// const io = new Server(server);
+const io = require('./socket').init(server);
+
 const sequelize = require('./util/database');
 const path = require('path');
 const multer = require('multer');
@@ -10,6 +16,8 @@ const groupRoute = require('./routers/groupRoute');
 const invitationRoute = require('./routers/invitationRoute');
 const userRoute = require('./routers/userRouter');
 const fileRoute = require('./routers/fileRoute');
+const reportRoute = require('./routers/reportRoute');
+const backupRoute = require('./routers/backupRoute');
 
 const User = require('./models/User');
 const Group = require('./models/Group');
@@ -18,6 +26,8 @@ const Invitation = require('./models/Invitation');
 const SuperAdmin = require('./models/SuperAdmin');
 const File = require('./models/File');
 const Report = require('./models/Report');
+const Backup = require('./models/Backup');
+const SocketUser = require('./models/SocketUser')
 
 // const routeMiddleware = require('./middleware/routers');
 
@@ -40,7 +50,8 @@ app.use('/group',groupRoute);
 app.use('/invitation',invitationRoute);
 app.use('/user',userRoute);
 app.use('/file',fileRoute);
-
+app.use('/report',reportRoute);
+app.use('/backup',backupRoute);
 
 app.use(( error , req , res , next )=>{
     const status = error.statusCode || 500 ; 
@@ -78,16 +89,41 @@ Invitation.belongsTo(Group , {foreignKey : 'groupId'});
 
 File.belongsTo(Group , {foreignKey : 'groupId'});
 File.hasMany(Report , {foreignKey : 'fileId'});
+File.hasMany(Backup , {foreignKey : 'fileId'});
 
 Report.belongsTo(File , {foreignKey : 'fileId'});
 Report.belongsTo(User , {foreignKey : 'userId'});
 
+Backup.belongsTo(File , {foreignKey : 'fileId'});
+
+io.on('connection' , (socket)=>{
+    console.log('userConected :',socket.id);
+    socket.on('register' , async(userId)=>{
+        const socketUser = await SocketUser.findOne({
+            where : {userId : userId}
+        });
+        if(socketUser){
+            socketUser.socketId = socket.id ;
+            await socketUser.save();
+        }
+        else{
+            await SocketUser.create({
+                    socketId : socket.id ,
+                    userId : userId
+                });
+        }
+    })
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+        // Handle user disconnection logic
+    });
+})
 // routeMiddleware;
 // {force : true }
 sequelize.sync()
 .then(result => {
     // console.log("the the the ",Invitation.associations);
     // console.log(result);
-    app.listen(3000);
+    server.listen(3000);
 })
 .catch(err => console.log(err));

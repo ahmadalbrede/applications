@@ -8,14 +8,18 @@ const Report = sequelize.define('report' , {
         autoIncrement : true ,
         primaryKey : true 
     },
-    checkIn : {
-        type : Sequelize.DATE ,
+    date : {
+        type : Sequelize.DATE,
+        allwoNull : false 
+    },
+    modifications : {
+        type : Sequelize.JSON , 
         allowNull : false 
     },
-    checkOut : {
-        type : Sequelize.DATE ,
-        allowNull : false 
-    }
+    // userId : {
+    //     type : Sequelize.INTEGER,
+    //     allowNull : false 
+    // }
 });
 
 module.exports = Report ;

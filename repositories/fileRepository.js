@@ -3,6 +3,17 @@ const File = require('../models/File');
 exports.createFile = async(data)=>{
     return await File.create(data);
 }
+exports.updateFileWithTransaction = async(data , transaction)=>{
+    return await File.update(
+        {path : data.path , state : true , userId : null},{
+            where : {
+                id : data.fileId
+            },
+            transaction
+        }
+    )
+}
+
 exports.updateFile = async(data)=>{
     return await File.update(
         {path : data.path , state : true , userId : null},{
@@ -24,6 +35,23 @@ exports.getFilesByGroupId = async(groupId)=>{
 
 exports.getFileById = async(fileId)=>{
     return await File.findByPk(fileId);
+}
+
+exports.getFileByIdWithTransaction = async(fileId , transaction)=>{
+    return await File.findAll({
+        where : {
+            id : fileId
+        },
+        transaction
+    });
+}
+
+exports.getFileById = async(fileId)=>{
+    return await File.findAll({
+        where : {
+            id : fileId
+        },
+    });
 }
 
 exports.deleteFile = async(fileId)=>{

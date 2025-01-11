@@ -28,23 +28,6 @@ exports.addFile = (req, res, next) => {
     .catch(err => next(err)); 
 };
 
-exports.updateFile = (req , res , next)=>{
-    const file = req.file ;
-    if(!file){
-        const error = new Error('the file is required');
-        error.statusCode = 422 ;
-        throw error ;
-    }
-    const data = req.query ;
-    data.path = file.path;
-    fileService.updateFile(data , req.user.id)
-    .then(result => {
-        return res.status(200).json({
-            message : "check out successfuly",
-        })
-    }).catch(err => next(err));
-}
-
 exports.getFilesForGroup = (req , res , next)=>{
     fileService.getFilesForGroup(req.query.groupId , req.user.id)
     .then(result => {
@@ -110,6 +93,23 @@ exports.checkInMultipleFile = (req, res, next) => {
         return res.status(200).json(result);
     }).catch((err) => next(err));
 };
+
+exports.updateFile = (req , res , next)=>{
+    const file = req.file ;
+    if(!file){
+        const error = new Error('the file is required');
+        error.statusCode = 422 ;
+        throw error ;
+    }
+    const data = req.query ;
+    data.path = file.path;
+    withTransactionAspect(fileService.updateFile, data , req.user.id)
+    .then(result => {
+        return res.status(200).json({
+            message : "check out successfuly",
+        })
+    }).catch(err => next(err));
+}
 
 exports.getFilesNotAccept = (req , res , next)=>{
     fileService.getFileNotAccept(req.query.groupId)

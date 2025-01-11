@@ -37,6 +37,12 @@ exports.getgroupUser = async(groupId , userId)=>{
     })
 }
 
+exports.getUsersByGroupId = async(groupId)=>{
+    return await GroupUser.findAll({
+        where : {groupId : groupId}
+    });
+}
+
 
 exports.getgroupUserWithTransaction = async (groupId, userId, transaction) => {
     return await GroupUser.findAll({
