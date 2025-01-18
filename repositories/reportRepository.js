@@ -56,3 +56,14 @@ exports.getReportToUser = async(userId , groupId)=>{
         }
     )
 };
+
+exports.getReportUserToAdmin = async(userId)=>{
+    return await Report.findAll({
+        where : {userId : userId },
+        include :[{
+            model : File ,
+            required : true ,
+            attributes : ['id','name'],
+        }]
+    });
+}

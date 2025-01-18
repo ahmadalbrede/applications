@@ -47,3 +47,10 @@ exports.groupIdValidation = [
     validatorResult
 ]
 
+exports.userIdValidation = [
+    query('userId').trim()
+    .notEmpty().withMessage('userId is required')
+    .isInt({ gt: 0 }).withMessage('userId must be a positive integer'),
+
+    validatorResult
+]

@@ -43,6 +43,16 @@ exports.getUsersByGroupId = async(groupId)=>{
     });
 }
 
+exports.getUsersToGroup = async(groupId)=>{
+    return await GroupUser.findAll({
+        where : {groupId : groupId},
+        include : {
+            model : User , 
+            required : true,
+            attributes : ['id' , 'name' , 'email']
+        }
+    })
+}
 
 exports.getgroupUserWithTransaction = async (groupId, userId, transaction) => {
     return await GroupUser.findAll({
